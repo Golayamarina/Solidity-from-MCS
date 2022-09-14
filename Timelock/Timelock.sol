@@ -58,7 +58,7 @@ contract Timelock {
 
            bytes memory data;
 
-           if (bytes(_func).lenght > 0) {
+           if (bytes(_func).length > 0) {
                data = abi.encodePacked(
                    bytes4(keccak256(bytes(_func))), _data
                    );
