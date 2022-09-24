@@ -43,10 +43,6 @@ contract ERC721 is IERC721, IERC721Metadata {
         _safeTransfer(from, to, tokenId, data);
     }
 
-
-
-    
-
     function name() external view returns(string memory) {
         return _name;
     }
@@ -108,12 +104,30 @@ contract ERC721 is IERC721, IERC721Metadata {
         emit Transfer(address(0), to, tokenId);
 
          _afterTokenTransfer(address(0), to, tokenId);
+    }
+
+    function burn(uint256 tokenId) public virtual {
+        require(_isApprovedOrOwner(msg.sender, tokenId), "not owner!");
+       
+        _burn(tokenId);
+    }
+
+    function _burn(uint tokenId) internal virtual {
+        address owner = ownerOf(tokenId);
+
+        _beforeTokenTransfer(owner, address(0), tokenId);
+
+        delete _tokenApprovals[tokenId];
+        _balances[owner]--;
+        delete _owners[tokenId];
+
+        emit Transfer(owner, address(0), tokenId);
+
+        _afterTokenTransfer(owner, address(0), tokenId);
         
     }
 
-
-
-    function _baseURI() internal view virtual returns(string memory) {
+    function _baseURI() internal pure virtual returns(string memory) {
         return "";
     }
 
@@ -124,8 +138,6 @@ contract ERC721 is IERC721, IERC721Metadata {
         string(abi.encodePacked(baseURI, tokenId.toString())) :
         "";
     }
-
-    
 
     function _exists(uint tokenId) internal view returns(bool) {
         return true;
