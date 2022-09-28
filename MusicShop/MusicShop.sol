@@ -22,7 +22,7 @@ contract MusicShop {
     Album[] public albums;
     Order[] public orders;
 
-    uint currentIndex;
+    uint public currentIndex;
 
     address public owner;
 
@@ -77,6 +77,7 @@ contract MusicShop {
     receive() external payable {
         revert("Please use the buy function to purchase albums");
     }
+
 
     function allAlbums() external view returns(Album[] memory) {
         Album[] memory albumsList = new Album[](albums.length);
