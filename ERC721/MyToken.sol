@@ -5,7 +5,7 @@ import "./ERC721.sol";
 import "./ERC721Enumerable.sol";
 import "./ERC721URIStorage.sol";
 
-contract MyToken is ERC721 {
+contract MyToken is ERC721, ERC721Enumerable, ERC721URIStorage {
     address public owner;
     uint currentTokenId;
 
@@ -17,10 +17,19 @@ contract MyToken is ERC721 {
         require(owner == msg.sender, "not an owner!");
 
         _safeMint(to, currentTokenId);
+        _setTokenURI(currentTokenId, tokenId);
         currentTokenId++;
     }
 
-    function _baseURI() internal pure ovverride returns(string memory) {
+    function _baseURI() internal pure override returns(string memory) {
         return "ifps://";
+    }
+
+    function _burn(uint tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI( uint tokenId) public view override(ERC721, ERC721URIStorage) returns(string memory) {
+        return super.tokenURI(tokenId);
     }
 }
