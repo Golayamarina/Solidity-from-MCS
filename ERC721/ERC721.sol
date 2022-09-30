@@ -35,10 +35,10 @@ contract ERC721 is IERC721, IERC721Metadata {
     }
 
     function safeTransferFrom(address from, address to, uint tokenId) public {
-        safeTransferFrom(from, to, tokenId, "");
+        safeTransferFrom(from, to, tokenId);
     }
 
-    function safeTransferFrom(address from, address to, uint tokenId, bytes calldata data) public {
+    function safeTransferFrom(address from, address to, uint tokenId, bytes memory data) public {
         require(_isApprovedOrOwner(msg.sender, tokenId), "not owner!");
         _safeTransfer(from, to, tokenId, data);
     }
@@ -62,9 +62,11 @@ contract ERC721 is IERC721, IERC721Metadata {
 
     function approve(address to, uint tokenId) public {
         address _owner = ownerOf(tokenId);
-        require(_owner == msg.sender || isApprovedForAll(_owner, msg.sender), "not an owner!");
+        require(
+           _owner == msg.sender || isApprovedForAll(_owner, msg.sender), 
+            "not an owner!");
         require(to != _owner, "cannot approve to self");
-
+    
         _tokenApprovals[tokenId] = to;
         emit Approval(_owner, to, tokenId);
     }
@@ -79,8 +81,8 @@ contract ERC721 is IERC721, IERC721Metadata {
         return _tokenApprovals[tokenId];
     }
 
-    function isApprovedForAll(address owner, address operator) public {
-        return _operatorApprovals[owner][operator];
+    function isApprovedForAll(address owner, address operator) public view returns(bool) {
+        return _tokenApprovals[owner][operator];
     }
 
     function _safeMint(address to, uint tokenId) internal virtual {
@@ -131,10 +133,10 @@ contract ERC721 is IERC721, IERC721Metadata {
         return "";
     }
 
-    function tokenURI(uint tokenId) external view _requireMinted(tokenId) returns(string memory) {
+    function tokenURI(uint tokenId) public view virtual _requireMinted(tokenId) returns(string memory) {
         string memory baseURI = _baseURI();
 
-        return bytes(baseURI).lenght > 0 ? 
+        return bytes(baseURI).length > 0 ? 
         string(abi.encodePacked(baseURI, tokenId.toString())) :
         "";
     }
@@ -157,12 +159,17 @@ contract ERC721 is IERC721, IERC721Metadata {
         require(_chekOnERC721Received(from, to, tokenId, data), "transfer to non-erc721 receiver");
     }
 
+    //function safeTransfer(address from, address to, uint tokenId) internal {
+       // _transfer(from, to, tokenId);
+        //require(_chekOnERC721Received(from, to, tokenId, ""), "transfer to non-erc721 receiver");
+   // }
+
     function _chekOnERC721Received(address from, address to, uint tokenId, bytes memory data) private returns(bool) {
-        if(to.code.lenght > 0) {
+        if(to.code.length > 0) {
             try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, data) returns(bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch(bytes memory reason) {
-                if(reason.lenght == 0) {
+                if(reason.length == 0) {
                     revert("Transfer to non-erc721 receiver");
                 } else {
                     assembly {
