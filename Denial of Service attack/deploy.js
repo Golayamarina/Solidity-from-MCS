@@ -9,7 +9,7 @@ async function main() {
     const auction = await Auction.deploy()
     await auction.deployed()
 
-    const Attack = await getContractFactory("Attack", deployer)
+    const Attack = await ethers.getContractFactory("Attack", deployer)
     const attack = await Attack.deploy(auction.address)
     await attack.deployed()
 
